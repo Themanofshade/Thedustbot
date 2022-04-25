@@ -1,0 +1,203 @@
+loadstring(game:HttpGet(('https://raw.githubusercontent.com/Proxylol/OtherScripts/main/AntiAfk.lua'),true))()
+function spawn()
+    local ship = tostring(game:GetService("Players").LocalPlayer.PlayerGui.Spawn.MainFrame.ShipStatsFrame.SampleText.Text)
+    local techtype = tostring(game:GetService("Players").LocalPlayer.PlayerGui.Spawn.TechFrame.CurrentTree.Value)
+    local args = {[1] = ship,[2] = techtype,[3] = game:GetService("ReplicatedStorage").Assets.FX.WarpEffects.Hyperspace}
+    game:GetService("ReplicatedStorage").Events.Spawn:FireServer(unpack(args))
+    game:GetService("Players").LocalPlayer.PlayerGui.Spawn.Enabled = false
+end
+
+
+function launch()  
+    local ship = tostring(game:GetService("Players").LocalPlayer.PlayerGui.Spawn.MainFrame.ShipStatsFrame.SampleText.Text)
+    local children = game:GetService("Players").LocalPlayer.Character[ship]:GetChildren()
+    for i, child in ipairs(children) do
+        if child.Name == "Hangar" then
+            local args = {
+            [1] = child,
+            [2] = "Launch"
+            }
+            game:GetService("ReplicatedStorage").Events.ChangeFighter:FireServer(unpack(args))
+        end
+    end
+end
+
+
+function contains(list, x)
+	for _, v in pairs(list) do
+		if (v == x) then 
+		    return true 
+		end
+	end
+	return false
+end
+
+function findenemies()
+    local myteam = game:GetService("Players").LocalPlayer.Team
+    targets2 = {}
+    local theplayers = game:GetService("Players"):GetChildren()
+    for i, v in pairs(theplayers) do
+        if theplayers[i].Team == myteam then
+            local pee = 0
+        else
+            table.insert(targets2, v.Name)
+            
+        end
+    end
+    
+    return targets2
+end
+
+function findtarget2()
+    local targets = game:GetService("Players").LocalPlayer.PlayerGui.FlightGui.Targets:GetChildren()
+    local templist1 = {}
+    local players = game:GetService("Players")
+    local targets3 = {}
+    findenemies()
+    for i, child in pairs(targets) do
+        if contains(targets2, child.Name) == true then
+            table.insert(targets3, child)
+            print(targets3[i])
+        else
+            print("Not work")
+        end
+    end
+    
+    for i, child in pairs(targets3) do
+        child = child.SDis.Text
+	    child = string.split(child, " ")
+	    child = tonumber(child[1])
+	    print(child)
+	    table.insert(templist1, child)
+    end
+    local dis = math.huge
+    for check = 1, #templist1  do
+        dis = dis < templist1[check] and dis or templist1[check]
+    end
+    local index={}
+    for k,v in pairs(templist1) do
+        index[v]=k
+    end
+    local thetarget = index[dis]
+    thetarget2 = tostring(targets3[thetarget])
+    print(thetarget2)
+    return(thetarget2)
+end
+
+
+function focusset(thetarget2)
+    if thetarget2 == "nil" then
+        print("nothing")
+    else
+        if game:GetService("Players").LocalPlayer.PlayerGui.FlightGui.Enabled == true then
+            print("worked")
+            local ClickMod = require(game:GetService("Players").LocalPlayer.Backpack.Flyer.TargetFocus)
+            local ClickMod = require(game:GetService("Players").LocalPlayer.Backpack.Flyer.TargetFocus)
+            local getmainplayer = game:GetService("Players")[thetarget2]
+            ClickMod:SetFocusFromPlayer(getmainplayer)
+        end
+    end
+end
+    
+
+function attack2(target)
+    local count6 = game:GetService("Players").LocalPlayer.Character:GetChildren()
+    if target == "nil" then
+        print("nothing")
+        return
+    elseif #count6 > 0 and game:GetService("Players").LocalPlayer.PlayerGui.FlightGui.Enabled == true then
+        local ship = tostring(game:GetService("Players").LocalPlayer.PlayerGui.Spawn.MainFrame.ShipStatsFrame.SampleText.Text)
+        local spart = game:GetService("Players").LocalPlayer.Character:FindFirstChild(ship)
+        local children = spart:GetChildren()
+        local enemyshipname = game:GetService("Players")[target].Character:GetChildren()
+        local enemyshipname2 = tostring(enemyshipname[1])
+        for i, child in ipairs(children) do
+            if child.Name == "TurretBase" then
+                local args = {
+                    [1] = "Fire",
+                    [2] = {
+                        [1] = child.Barrel
+                    },
+                    [3] = game:GetService("Players")[target].Character:FindFirstChild(enemyshipname2).Engine
+                }
+                game:GetService("ReplicatedStorage").Events.ChangeFire:FireServer(unpack(args))
+            end
+        end
+    end
+end
+
+
+
+function attack(target)
+    print(target)
+    if target == "nil" then
+        print("avoided")
+        
+    else
+        local ship = tostring(game:GetService("Players").LocalPlayer.PlayerGui.Spawn.MainFrame.ShipStatsFrame.SampleText.Text)
+        local count6 = game:GetService("Players").LocalPlayer.Character:GetChildren()
+        
+        if #count6 > 0 then
+            local spart = game:GetService("Players").LocalPlayer.Character:FindFirstChild(ship)
+            local children = spart:GetChildren()
+            for i, child in ipairs(children) do
+                if child.Name == "Hangar" then
+                    local args = {
+                    [1] = child,
+                    [2] = "Attacking",
+                    [3] = tostring(target)
+                    }
+                    game:GetService("ReplicatedStorage").Events.ChangeFighter:FireServer(unpack(args))
+                end
+            end
+        else
+            print("avoided2")
+        end
+    end
+end
+
+
+
+function main(enabled)
+    
+    while enabled == true do
+        print("repeated")
+        count = game:GetService("Players").LocalPlayer.Character:GetChildren()
+        if #count > 0 then
+            print("option2")
+            launch()
+            wait(.1)
+            findtarget2()
+            wait(.1)
+            print("the target input for attack will be", thetarget2)
+            attack(thetarget2)
+            focusset(thetarget2)
+            attack2(thetarget2)
+        else
+            print("option1")
+            spawn()
+            wait(15)
+            count = game:GetService("Players").LocalPlayer.Character:GetChildren()
+            if #count > 0 then
+                launch()
+                wait(2)
+                count = game:GetService("Players").LocalPlayer.Character:GetChildren()
+                if #count > 0 then
+                    findtarget2()
+                    print("the target input for attack will be", thetarget2)
+                end
+                attack(thetarget2)
+                focusset(thetarget2)
+                attack2(thetarget2)
+            else
+                wait(30)
+            end
+        end
+        wait(5)
+    end
+end
+
+enabled = true
+
+main(enabled)
+
